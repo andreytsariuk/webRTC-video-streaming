@@ -10,7 +10,7 @@ import cv2
 from aiohttp import web
 from av import VideoFrame
 
-from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription
+from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
 from aiortc.contrib.media import MediaBlackhole, MediaPlayer, MediaRecorder
 
 ROOT = os.path.dirname(__file__)
@@ -20,6 +20,22 @@ pcs = []
 
 tracks=[]
 
+
+class CopiedVideoStreamTrack(VideoStreamTrack):
+    """
+    A video track that returns an animated flag.
+    """
+
+    def __init__(self):
+        super().__init__()  # don't forget this!
+        self.counter = 0
+        self.frame = None
+
+        print('INIT=========')
+
+
+    async def recv(self):
+        return self
 
 class VideoTransformTrack(MediaStreamTrack):
     """
@@ -67,7 +83,11 @@ async def stream(request):
     pcs.append(pc)
     print('track_id ',track_id)
 
-    current_track = tracks[track_id] 
+    if len(tracks) != 0 :
+        current_track = tracks[track_id] 
+        new_stream_track = CopiedVideoStreamTrack()
+        new_stream_track.recv = current_track.recv
+        pc.addTrack(new_stream_track)
 
 
     def log_info(msg, *args):
@@ -95,7 +115,6 @@ async def stream(request):
 
     # handle offer
     await pc.setRemoteDescription(offer)
-    pc.addTrack(current_track)
     # send answer
     answer = await pc.createAnswer()
     await pc.setLocalDescription(answer)

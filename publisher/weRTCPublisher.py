@@ -115,7 +115,7 @@ class FlagVideoStreamTrack(VideoStreamTrack):
     async def add_frame(self, frame):
         colored_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.frame = VideoFrame.from_ndarray(colored_frame) 
-        await asyncio.sleep(0.2)   
+        await asyncio.sleep(0.1)   
 
     async def recv(self):
         pts, time_base = await self.next_timestamp()
