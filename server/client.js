@@ -1,5 +1,11 @@
 var pc = null;
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOMContentLoaded')
+    start()
+});
+
 function negotiate() {
     pc.addTransceiver('video', { direction: 'recvonly' });
     pc.addTransceiver('audio', { direction: 'recvonly' });
@@ -38,11 +44,12 @@ function negotiate() {
     }).then(function (answer) {
         return pc.setRemoteDescription(answer);
     }).catch(function (e) {
-        alert(e);
+       console.log('e: ',e)
     });
 }
 
 function start() {
+    console.log('Start ')
     var config = {
         sdpSemantics: 'unified-plan'
     };
@@ -63,14 +70,11 @@ function start() {
             document.getElementById('audio').srcObject = evt.streams[0];
         }
     });
+    negotiate()
 
-    document.getElementById('start').style.display = 'none';
-    negotiate();
-    document.getElementById('stop').style.display = 'inline-block';
 }
 
 function stop() {
-    document.getElementById('stop').style.display = 'none';
 
     // close peer connection
     setTimeout(function () {

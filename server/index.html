@@ -1,42 +1,134 @@
 <html>
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebRTC webcam</title>
     <style>
-    button {
-        padding: 8px 16px;
-    }
+        button {
+            padding: 8px 16px;
+        }
 
-    video {
-        width: 100%;
-    }
+        video {
+            width: 100%;
+        }
 
-    .option {
-        margin-bottom: 8px;
-    }
+        .option {
+            margin-bottom: 8px;
+        }
 
-    #media {
-        max-width: 1280px;
-    }
+        #media {
+            max-width: 1280px;
+            width: 98%;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        video {
+            border: 2px black solid;
+            border-radius: 1%;
+            background-color: white;
+            opacity: 0.9;
+        }
+
+        .bg {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* ---- reset ---- */
+
+        body {
+            margin: 0;
+            font: normal 75% Arial, Helvetica, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            vertical-align: bottom;
+        }
+
+        /* ---- particles.js container ---- */
+
+        #particles-js {
+            position: absolute;
+            z-index: -999;
+            width: 100%;
+            height: 100%;
+            background-image: url("");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 50% 50%;
+        }
+
+        /* ---- stats.js ---- */
+
+        .count-particles {
+            background: #000022;
+            position: absolute;
+            top: 48px;
+            left: 0;
+            width: 80px;
+            color: #13E8E9;
+            font-size: .8em;
+            text-align: left;
+            text-indent: 4px;
+            line-height: 14px;
+            padding-bottom: 2px;
+            font-family: Helvetica, Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .js-count-particles {
+            font-size: 1.1em;
+        }
+
+        #stats,
+        .count-particles {
+            -webkit-user-select: none;
+        }
+
+        #stats {
+            border-radius: 3px 3px 0 0;
+            overflow: hidden;
+        }
+
+        .count-particles {
+            border-radius: 0 0 3px 3px;
+        }
+
+        .sigma-logo {
+            max-width: 400px;
+        }
     </style>
 </head>
+
 <body>
+    <!-- particles.js container -->
+    <div id="particles-js"></div>
+    <img class="sigma-logo" src="https://volvo-stream.s3.eu-central-1.amazonaws.com/Sigma-Software-logo.png" alt="">
 
-<div class="option">
-    <input id="use-stun" type="checkbox"/>
-    <label for="use-stun">Use STUN server</label>
-</div>
-<button id="start" onclick="start()">Start</button>
-<button id="stop" style="display: none" onclick="stop()">Stop</button>
+    <!-- stats - count particles -->
+    <div class="count-particles">
+        <span class="js-count-particles">--</span> particles
+    </div>
+    <div class="bg">
+        <div id="media">
 
-<div id="media">
-    <h2>Media</h2>
+            <audio id="audio" autoplay="true"></audio>
+            <video id="video" autoplay="true" playsinline="true"></video>
 
-    <audio id="audio" autoplay="true"></audio>
-    <video id="video" autoplay="true" playsinline="true"></video>
-</div>
-
-<script src="client.js"></script>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="client.js"></script>
+    <script src="style.js"></script>
 </body>
+
 </html>

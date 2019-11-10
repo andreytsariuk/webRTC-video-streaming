@@ -46,6 +46,14 @@ async def javascript(request):
     content = open(os.path.join(ROOT, "client.js"), "r").read()
     return web.Response(content_type="application/javascript", text=content)
 
+async def style_javascript(request):
+    content = open(os.path.join(ROOT, "js/style.js"), "r").read()
+    return web.Response(content_type="application/javascript", text=content)
+
+async def particles_javascript(request):
+    content = open(os.path.join(ROOT, "js/particles.js"), "r").read()
+    return web.Response(content_type="application/javascript", text=content)
+
 async def stream(request):
     params = await request.json()
     offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
@@ -189,6 +197,8 @@ if __name__ == "__main__":
     app.on_shutdown.append(on_shutdown)
     app.router.add_get("/", index)
     app.router.add_get("/client.js", javascript)
+    app.router.add_get("/style.js", style_javascript)
+    app.router.add_get("/particles.js", particles_javascript)
     app.router.add_post("/stream", stream)
     app.router.add_post("/offer", offer)
     web.run_app(app, access_log=None, port=args.port, ssl_context=ssl_context)
