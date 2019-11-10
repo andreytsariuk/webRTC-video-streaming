@@ -80,10 +80,17 @@ async def stream(request):
         log_info("ICE connection state is %s", pc.iceConnectionState)
         if pc.iceConnectionState == 'closed':
             await pc.close()
-            pcs.pop(index)
+            try:
+                pcs.pop(index)
+            except :
+                pass
+            
         if pc.iceConnectionState == "failed":
             await pc.close()
-            pcs.pop(index)
+            try:
+                pcs.pop(index)
+            except :
+                pass
 
 
     # handle offer
@@ -129,10 +136,16 @@ async def offer(request):
         log_info("ICE connection state is %s", pc.iceConnectionState)
         if pc.iceConnectionState == 'closed':
             await pc.close()
-            pcs.pop(index)
+            try:
+                pcs.pop(index)
+            except :
+                pass
         if pc.iceConnectionState == "failed":
             await pc.close()
-            pcs.pop(index)
+            try:
+                pcs.pop(index)
+            except :
+                pass
 
     @pc.on("track")
     def on_track(track):
