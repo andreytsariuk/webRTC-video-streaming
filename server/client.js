@@ -1,13 +1,13 @@
 var pc = null;
 
 function negotiate() {
-    pc.addTransceiver('video', {direction: 'recvonly'});
-    pc.addTransceiver('audio', {direction: 'recvonly'});
-    return pc.createOffer().then(function(offer) {
+    pc.addTransceiver('video', { direction: 'recvonly' });
+    pc.addTransceiver('audio', { direction: 'recvonly' });
+    return pc.createOffer().then(function (offer) {
         return pc.setLocalDescription(offer);
-    }).then(function() {
+    }).then(function () {
         // wait for ICE gathering to complete
-        return new Promise(function(resolve) {
+        return new Promise(function (resolve) {
             if (pc.iceGatheringState === 'complete') {
                 resolve();
             } else {
@@ -20,24 +20,24 @@ function negotiate() {
                 pc.addEventListener('icegatheringstatechange', checkState);
             }
         });
-    }).then(function() {
+    }).then(function () {
         var offer = pc.localDescription;
         return fetch('/stream', {
             body: JSON.stringify({
                 sdp: offer.sdp,
                 type: offer.type,
-                track_id:0
+                track_id: 0
             }),
             headers: {
                 'Content-Type': 'application/json'
             },
             method: 'POST'
         });
-    }).then(function(response) {
+    }).then(function (response) {
         return response.json();
-    }).then(function(answer) {
+    }).then(function (answer) {
         return pc.setRemoteDescription(answer);
-    }).catch(function(e) {
+    }).catch(function (e) {
         alert(e);
     });
 }
@@ -47,14 +47,26 @@ function start() {
         sdpSemantics: 'unified-plan'
     };
 
-    if (document.getElementById('use-stun').checked) {
-        config.iceServers = [{urls: ['stun:stun.l.google.com:19302']}];
-    }
+    config.iceServers = [
+        {
+            'url': 'stun:stun.l.google.com:19302'
+        },
+        {
+            'url': 'turn:192.158.29.39:3478?transport=udp',
+            'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            'username': '28224511:1379330808'
+        },
+        {
+            'url': 'turn:192.158.29.39:3478?transport=tcp',
+            'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            'username': '28224511:1379330808'
+        }
+    ];
 
     pc = new RTCPeerConnection(config);
 
     // connect audio / video
-    pc.addEventListener('track', function(evt) {
+    pc.addEventListener('track', function (evt) {
         if (evt.track.kind == 'video') {
             document.getElementById('video').srcObject = evt.streams[0];
         } else {
@@ -71,7 +83,7 @@ function stop() {
     document.getElementById('stop').style.display = 'none';
 
     // close peer connection
-    setTimeout(function() {
+    setTimeout(function () {
         pc.close();
     }, 500);
 }
