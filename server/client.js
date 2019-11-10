@@ -22,7 +22,7 @@ function negotiate() {
         });
     }).then(function() {
         var offer = pc.localDescription;
-        return fetch('http://ec2-13-53-212-20.eu-north-1.compute.amazonaws.com/stream', {
+        return fetch('/stream', {
             body: JSON.stringify({
                 sdp: offer.sdp,
                 type: offer.type,
