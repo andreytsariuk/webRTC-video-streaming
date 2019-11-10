@@ -22,7 +22,7 @@ function negotiate() {
         });
     }).then(function () {
         var offer = pc.localDescription;
-        return fetch('/stream', {
+        return fetch('http://ec2-13-53-212-20.eu-north-1.compute.amazonaws.com/stream', {
             body: JSON.stringify({
                 sdp: offer.sdp,
                 type: offer.type,
@@ -50,16 +50,6 @@ function start() {
     config.iceServers = [
         {
             'url': 'stun:stun.l.google.com:19302'
-        },
-        {
-            'url': 'turn:192.158.29.39:3478?transport=udp',
-            'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-            'username': '28224511:1379330808'
-        },
-        {
-            'url': 'turn:192.158.29.39:3478?transport=tcp',
-            'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-            'username': '28224511:1379330808'
         }
     ];
 
