@@ -30,12 +30,13 @@ class webRTCPublisher:
         self.streamTrack = FlagVideoStreamTrack()
 
 
-    async def run(self, pc, player, recorder):
+    async def run(self, pc, player):
+        print('RUN')
         pc.addTrack(self.streamTrack)
         await pc.setLocalDescription(await pc.createOffer())
 
 
-        URL='http://ec2-13-53-212-20.eu-north-1.compute.amazonaws.com/offer'
+        URL='http://localhost:8080/offer'
         headers = {'Content-type': 'application/json',
            'Accept': 'text/plain',
            'Content-Encoding': 'utf-8'}
@@ -49,9 +50,8 @@ class webRTCPublisher:
         session = RTCSessionDescription(sdp=answer["sdp"], type=answer["type"])
 
         await pc.setRemoteDescription(session)
-        await recorder.start()
 
-    def create_connection(self, recorder):
+    def create_connection(self):
         pc = RTCPeerConnection(configuration=RTCConfiguration(
                 iceServers=[RTCIceServer(
                     urls=['stun:stun.l.google.com:19302'])]))
@@ -83,15 +83,13 @@ class webRTCPublisher:
         # create media source
         player = None
         
-        recorder = MediaRecorder("demo-instruct.mp4")
 
-        pc = self.create_connection(recorder)
+        pc = self.create_connection()
         pcs.add(pc)
         # run event loop
         await  self.run(
                     pc=pc,
-                    player=player,
-                    recorder=recorder
+                    player=player
                 )
 
         #await   pc.close()

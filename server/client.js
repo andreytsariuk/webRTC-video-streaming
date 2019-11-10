@@ -3,7 +3,25 @@ var pc = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOMContentLoaded')
-    start()
+
+
+    var btn = document.querySelector(".play-btn");
+    var media = document.querySelector("#media");
+    btn.classList.add("elementToFadeIn");
+
+    btn.addEventListener("click", function () {
+        console.log('SDSD')
+        btn.classList.add("elementToFadeOut");
+        // Wait until the animation is over and then remove the class, so that
+        // the next click can re-add it.
+        start()
+        setTimeout(function () {
+            btn.classList.remove("elementToFadeOut");
+            btn.setAttribute("style", "visibility:hidden;");
+            media.classList.add("elementToFadeIn");
+
+        }, 1000);
+    });
 });
 
 function negotiate() {
@@ -44,7 +62,7 @@ function negotiate() {
     }).then(function (answer) {
         return pc.setRemoteDescription(answer);
     }).catch(function (e) {
-       console.log('e: ',e)
+        console.log('e: ', e)
     });
 }
 
