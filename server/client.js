@@ -10,14 +10,12 @@ document.addEventListener('DOMContentLoaded', function () {
     btn.classList.add("elementToFadeIn");
 
     btn.addEventListener("click", function () {
-        console.log('SDSD')
         btn.classList.add("elementToFadeOut");
         // Wait until the animation is over and then remove the class, so that
         // the next click can re-add it.
         setTimeout(function () {
             btn.classList.remove("elementToFadeOut");
             btn.setAttribute("style", "visibility:hidden;");
-            alert('SHOW MEDIA STart')
             media.classList.add("elementToFadeIn");
             start()
 
@@ -27,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function negotiate() {
     alert('negotiate')
-    
+
     pc.addTransceiver('video', { direction: 'recvonly' });
     pc.addTransceiver('audio', { direction: 'recvonly' });
     return pc.createOffer().then(function (offer) {
@@ -70,8 +68,6 @@ function negotiate() {
 }
 
 function start() {
-    alert('start')
-    console.log('Start ')
     var config = {
         sdpSemantics: 'unified-plan'
     };
@@ -86,12 +82,9 @@ function start() {
 
     // connect audio / video
     pc.addEventListener('track', function (evt) {
-        if (evt.track.kind == 'video') {
-            document.getElementById('video').srcObject = evt.streams[0];
-        } else {
-            document.getElementById('audio').srcObject = evt.streams[0];
-        }
+        document.getElementById('video').srcObject = evt.streams[0];
     });
+    alert('start')
     negotiate()
 
 }
