@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.classList.add("elementToFadeOut");
         // Wait until the animation is over and then remove the class, so that
         // the next click can re-add it.
-        start()
         setTimeout(function () {
             btn.classList.remove("elementToFadeOut");
             btn.setAttribute("style", "visibility:hidden;");
             alert('SHOW MEDIA STart')
             media.classList.add("elementToFadeIn");
+            start()
 
         }, 1000);
     });
