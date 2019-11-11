@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(function () {
             btn.classList.remove("elementToFadeOut");
             btn.setAttribute("style", "visibility:hidden;");
+            alert('SHOW MEDIA STart')
             media.classList.add("elementToFadeIn");
 
         }, 1000);
@@ -25,6 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function negotiate() {
+    alert('negotiate')
+    
     pc.addTransceiver('video', { direction: 'recvonly' });
     pc.addTransceiver('audio', { direction: 'recvonly' });
     return pc.createOffer().then(function (offer) {
@@ -67,6 +70,7 @@ function negotiate() {
 }
 
 function start() {
+    alert('start')
     console.log('Start ')
     var config = {
         sdpSemantics: 'unified-plan'
