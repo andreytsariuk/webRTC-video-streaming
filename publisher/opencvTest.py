@@ -7,14 +7,13 @@ import asyncio
 
 async def _test(pub):
     cap = cv2.VideoCapture(0)   
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    #cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     while(True): 
         ret, frame = cap.read()
 
         if(frame is not None):
             await pub.streamTrack.add_frame(frame)
-
             
             
     cap.release() 

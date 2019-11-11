@@ -36,7 +36,7 @@ class webRTCPublisher:
         await pc.setLocalDescription(await pc.createOffer())
 
 
-        URL='http://ec2-13-53-212-20.eu-north-1.compute.amazonaws.com/offer'
+        URL='http://127.0.0.1:8080/offer'
         headers = {'Content-type': 'application/json',
            'Accept': 'text/plain',
            'Content-Encoding': 'utf-8'}
@@ -113,7 +113,7 @@ class FlagVideoStreamTrack(VideoStreamTrack):
     async def add_frame(self, frame):
         colored_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.frame = VideoFrame.from_ndarray(colored_frame) 
-        await asyncio.sleep(0.07)   
+        await asyncio.sleep(0.04)   
 
     async def recv(self):
         pts, time_base = await self.next_timestamp()
