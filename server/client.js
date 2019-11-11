@@ -13,19 +13,17 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.classList.add("elementToFadeOut");
         // Wait until the animation is over and then remove the class, so that
         // the next click can re-add it.
+        start()
         setTimeout(function () {
             btn.classList.remove("elementToFadeOut");
             btn.setAttribute("style", "visibility:hidden;");
             media.classList.add("elementToFadeIn");
-            start()
 
         }, 1000);
     });
 });
 
 function negotiate() {
-    alert('negotiate')
-
     pc.addTransceiver('video', { direction: 'recvonly' });
     pc.addTransceiver('audio', { direction: 'recvonly' });
     return pc.createOffer().then(function (offer) {
@@ -84,7 +82,6 @@ function start() {
     pc.addEventListener('track', function (evt) {
         document.getElementById('video').srcObject = evt.streams[0];
     });
-    alert('start')
     negotiate()
 
 }
