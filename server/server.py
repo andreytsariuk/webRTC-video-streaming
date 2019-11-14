@@ -177,6 +177,7 @@ async def offer(request):
 
         @track.on("ended")
         async def on_ended():
+            tracks.clear()
             log_info("Track %s ended", track.kind)
 
     # handle offer
