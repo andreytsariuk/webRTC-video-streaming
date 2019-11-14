@@ -36,7 +36,7 @@ class webRTCPublisher:
         await pc.setLocalDescription(await pc.createOffer())
 
 
-        URL='http://127.0.0.1:8080/offer'
+        URL='http://ec2-13-53-212-20.eu-north-1.compute.amazonaws.com/offer'
         headers = {'Content-type': 'application/json',
            'Accept': 'text/plain',
            'Content-Encoding': 'utf-8'}
