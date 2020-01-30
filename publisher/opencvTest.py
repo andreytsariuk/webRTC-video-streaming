@@ -13,6 +13,7 @@ async def _test(pub):
         ret, frame = cap.read()
 
         if(frame is not None):
+            await asyncio.sleep(0.04)   
             await pub.streamTrack.add_frame(frame)
             
             

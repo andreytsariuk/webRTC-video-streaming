@@ -1,14 +1,54 @@
 var pc = null;
+var lastUpdate;
+var statusCheckInterval;
+var btn;
+var media;
+var btnClicked =false;
 
+function statusCheck() {
+    fetch('/check-state', {
+        body: JSON.stringify({}),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'POST'
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (response) {
+            if (!response.last_update)
+                return;
+            newLastUpdate = new Date(response.last_update * 1000);
+            console.log('response.last_update', newLastUpdate)
+            if (btnClicked && (!lastUpdate || newLastUpdate > lastUpdate)) {
+                console.log('RECONNET!!!!!!!!!!')
+                console.log('response.last_update!!!!!!!!!!', newLastUpdate)
+                console.log('lastUpdate!!!!!!!!!!', lastUpdate)
+                try {
+                    stop();
+                } catch (error) {
+                    console.log('err')
+                }
+               
+                start();
+            }
+        })
+        .catch(function (err) {
+
+        })
+}
+
+
+statusCheckInterval = setInterval(statusCheck, 2000)
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOMContentLoaded')
 
 
-    var btn = document.querySelector(".play-btn");
-    var media = document.querySelector("#media");
+    btn = document.querySelector(".play-btn");
+    media = document.querySelector("#media");
     btn.classList.add("elementToFadeIn");
-
     btn.addEventListener("click", function () {
         btn.classList.add("elementToFadeOut");
         // Wait until the animation is over and then remove the class, so that
@@ -18,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.classList.remove("elementToFadeOut");
             btn.setAttribute("style", "visibility:hidden;");
             media.classList.add("elementToFadeIn");
-
+            btnClicked = true;
         }, 1000);
     });
 });
@@ -59,6 +99,7 @@ function negotiate() {
     }).then(function (response) {
         return response.json();
     }).then(function (answer) {
+        lastUpdate = new Date();
         return pc.setRemoteDescription(answer);
     }).catch(function (e) {
         console.log('e: ', e)
@@ -89,7 +130,5 @@ function start() {
 function stop() {
 
     // close peer connection
-    setTimeout(function () {
-        pc.close();
-    }, 500);
+    pc.close();
 }

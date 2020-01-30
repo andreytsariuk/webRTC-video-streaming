@@ -36,7 +36,7 @@ class webRTCPublisher:
         await pc.setLocalDescription(await pc.createOffer())
 
 
-        URL='http://ec2-13-53-212-20.eu-north-1.compute.amazonaws.com/offer'
+        URL='http://localhost:8080/offer'
         headers = {'Content-type': 'application/json',
            'Accept': 'text/plain',
            'Content-Encoding': 'utf-8'}
@@ -63,6 +63,13 @@ class webRTCPublisher:
             if pc.iceConnectionState == "failed":
                 await pc.close()
                 pcs.clear()
+                new_pc = self.create_connection()
+                pcs.add(new_pc)
+                # run event loop
+                await  self.run(
+                    pc=new_pc,
+                    player=None
+                )
 
         return pc
 
@@ -113,7 +120,6 @@ class FlagVideoStreamTrack(VideoStreamTrack):
     async def add_frame(self, frame):
         colored_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.frame = VideoFrame.from_ndarray(colored_frame) 
-        await asyncio.sleep(0.04)   
 
     async def recv(self):
         pts, time_base = await self.next_timestamp()

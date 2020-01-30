@@ -5,7 +5,7 @@ import logging
 import os
 import ssl
 import uuid
-
+import datetime
 import cv2
 from aiohttp import web
 from av import VideoFrame
@@ -19,6 +19,16 @@ logger = logging.getLogger("pc")
 pcs = []
 
 tracks=[]
+
+class MainServerStreamConfig():
+
+    def __init__(self):
+        self.main_stream = None
+        self.main_track = None
+        self.last_update = datetime.datetime.now().timestamp()
+
+
+main_config = MainServerStreamConfig()
 
 
 class CopiedVideoStreamTrack(VideoStreamTrack):
@@ -70,6 +80,23 @@ async def particles_javascript(request):
     content = open(os.path.join(ROOT, "js/particles.js"), "r").read()
     return web.Response(content_type="application/javascript", text=content)
 
+
+async def check_state(request):
+    if(main_config.main_stream is not None):
+        return web.Response(
+            content_type="application/json",
+            text=json.dumps(
+                {"last_update": main_config.last_update}
+            ),
+        )
+    else:
+        return web.Response(
+            content_type="application/json",
+            text=json.dumps(
+                {"last_update": None}
+            ),
+        )
+
 async def stream(request):
     params = await request.json()
     offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
@@ -81,13 +108,14 @@ async def stream(request):
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
     index  = len(pcs)
     pcs.append(pc)
+
     print('track_id ',track_id)
 
-    if len(tracks) != 0 :
-        current_track = tracks[track_id] 
-        new_stream_track = CopiedVideoStreamTrack()
-        new_stream_track.recv = current_track.recv
-        pc.addTrack(new_stream_track)
+    #if len(tracks) != 0 :
+    #current_track = main_track 
+    new_stream_track = CopiedVideoStreamTrack()
+    new_stream_track.recv = main_config.main_track.recv
+    pc.addTrack(new_stream_track)
 
 
     def log_info(msg, *args):
@@ -114,6 +142,7 @@ async def stream(request):
 
 
     # handle offer
+    
     await pc.setRemoteDescription(offer)
     # send answer
     answer = await pc.createAnswer()
@@ -134,58 +163,67 @@ async def offer(request):
 
     pc = RTCPeerConnection()
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
-    index  = len(pcs)
-    pcs.append(pc)
-
+    #index  = len(pcs)
+    #pcs.append(pc)
+    main_config.main_stream = pc
     def log_info(msg, *args):
         logger.info(pc_id + " " + msg, *args)
 
     log_info("Created for %s", request.remote)
 
 
-    @pc.on("datachannel")
+    @main_config.main_stream.on("datachannel")
     def on_datachannel(channel):
         @channel.on("message")
         def on_message(message):
             if isinstance(message, str) and message.startswith("ping"):
                 channel.send("pong" + message[4:])
 
-    @pc.on("iceconnectionstatechange")
+    @main_config.main_stream.on("iceconnectionstatechange")
     async def on_iceconnectionstatechange():
-        log_info("ICE connection state is %s", pc.iceConnectionState)
-        if pc.iceConnectionState == 'closed':
-            await pc.close()
-            try:
-                pcs.pop(index)
-            except :
-                pass
-        if pc.iceConnectionState == "failed":
-            await pc.close()
-            try:
-                pcs.pop(index)
-            except :
-                pass
+        log_info("ICE connection state is %s", main_config.main_stream.iceConnectionState)
+        #if main_config.main_stream.iceConnectionState == 'closed':
+            #await main_config.main_stream.close()
+            #try:
+            #   pcs.pop(index)
+            #except :
+            #    pass
+        #if main_config.main_stream.iceConnectionState == "failed":
+            #main_config.main_stream.close()
+            #print('=================================FAILED=================================')
 
-    @pc.on("track")
+            #await pc.close()
+            #try:
+            #    pcs.pop(index)
+            #except :
+            #    pass
+
+    @main_config.main_stream.on("track")
     def on_track(track):
         log_info("Track %s received", track.kind)
+    
 
+        print('=================================VIDEO=================================')
+        main_config.last_update = datetime.datetime.now().timestamp()
+        main_config.main_track = track
+        main_config.main_stream.addTrack(main_config.main_track)
+        
+        #tracks.append(main_track)
+        print('TRACK ', main_config.main_track)
 
-        print('VIDEO')
-        pc.addTrack(track)
-        tracks.append(track)
-
-        @track.on("ended")
+        @main_config.main_track.on("ended")
         async def on_ended():
-            tracks.clear()
+            print('=================================TRACK ENDED=================================')
+
+            #main_config.main_track = None;
             log_info("Track %s ended", track.kind)
 
     # handle offer
-    await pc.setRemoteDescription(offer)
+    await main_config.main_stream.setRemoteDescription(offer)
 
     # send answer
-    answer = await pc.createAnswer()
-    await pc.setLocalDescription(answer)
+    answer = await main_config.main_stream.createAnswer()
+    await main_config.main_stream.setLocalDescription(answer)
 
     return web.Response(
         content_type="application/json",
@@ -233,5 +271,6 @@ if __name__ == "__main__":
     app.router.add_get("/style.js", style_javascript)
     app.router.add_get("/particles.js", particles_javascript)
     app.router.add_post("/stream", stream)
+    app.router.add_post("/check-state", check_state)
     app.router.add_post("/offer", offer)
     web.run_app(app, access_log=None, port=args.port, ssl_context=ssl_context)
